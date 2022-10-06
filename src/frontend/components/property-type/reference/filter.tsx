@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
 import { FormGroup, Label, SelectAsync } from '@adminjs/design-system'
+import React, { ReactNode } from 'react'
 
 import ApiClient from '../../../utils/api-client'
 import { FilterPropertyProps, SelectRecord } from '../base-property-props'
@@ -27,7 +27,7 @@ class Filter extends React.PureComponent<CombinedProps, FilterState> {
     onChange(property.path, selected ? selected.value : '')
   }
 
-  async loadOptions(inputValue: string): Promise<Array<{value: string | number; label: string }>> {
+  async loadOptions(inputValue: string): Promise<Array<SelectRecord>> {
     const { property } = this.props
     const records = await this.api.searchRecords({
       resourceId: property.reference as string,

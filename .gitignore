@@ -1,6 +1,7 @@
 .nyc_output
 .DS_store
 .vscode
+.nova
 .idea
 .cache
 lib
