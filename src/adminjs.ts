@@ -20,7 +20,6 @@ import { combineTranslations, Locale } from './locale/config'
 import { locales } from './locale'
 import { TranslateFunctions, createFunctions } from './utils/translate-functions.factory'
 import { relativeFilePathResolver } from './utils/file-resolver'
-import { OverridableComponent } from './frontend/utils/overridable-component'
 import { getComponentHtml } from './backend/utils'
 
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '../package.json'), 'utf-8'))
@@ -195,7 +194,7 @@ class AdminJS {
   }
 
   /**
-   * Watches for local changes in files imported via {@link AdminJS.bundle}.
+   * Watches for local changes in files imported via {@link ComponentLoader}.
    * It doesn't work on production environment.
    *
    * @return  {Promise<never>}
@@ -316,60 +315,6 @@ class AdminJS {
     }
     this.options.bundler.babelConfig = config
   }
-
-  /**
-   * Requires given `.jsx/.tsx` file, that it can be bundled to the frontend.
-   * It will be available under AdminJS.UserComponents[componentId].
-   *
-   * @param   {String}  src  Path to a file containing react component.
-   *
-   * @param  {OverridableComponent}  [componentName] - name of the component which you want
-   *                                  to override
-   * @returns {String}                componentId - uniq id of a component
-   *
-   * @example <caption>Passing custom components in AdminJS options</caption>
-   * const adminJsOptions = {
-   *   dashboard: {
-   *     component: AdminJS.bundle('./path/to/component'),
-   *   }
-   * }
-   * @example <caption>Overriding AdminJS core components</caption>
-   * // somewhere in the code
-   * AdminJS.bundle('./path/to/new-sidebar/component', 'SidebarFooter')
-   */
-  public static bundle(src: string, componentName?: OverridableComponent): string {
-    const nextId = Object.keys(global.UserComponents || {}).length + 1
-    const extensions = ['.jsx', '.js', '.ts', '.tsx']
-    let filePath = ''
-    const componentId = componentName || `Component${nextId}`
-    if (path.isAbsolute(src)) {
-      filePath = src
-    } else {
-      filePath = relativeFilePathResolver(src, /.*\.{1}bundle/)
-    }
-
-    const { ext: originalFileExtension } = path.parse(filePath)
-    for (const extension of extensions) {
-      const forcedExt = extensions.includes(originalFileExtension) ? '' : extension
-      const { root, dir, name, ext } = path.parse(filePath + forcedExt)
-      const fileName = path.format({ root, dir, name, ext })
-      if (fs.existsSync(fileName)) {
-        // We have to put this to the global scope because of the NPM resolution. If we put this to
-        // let say `AdminJS.UserComponents` (static member) it wont work in a case where user uses
-        // AdminJS.bundle from a different packages (i.e. from the extension) because there, there
-        // is an another AdminJS version (npm installs different versions for each package). Also
-        // putting admin to peerDependencies wont solve this issue, because in the development mode
-        // we have to install adminjs it as a devDependency, because we want to run test or have
-        // proper types.
-        global.UserComponents = global.UserComponents || {}
-        global.UserComponents[componentId] = path.format({ root, dir, name })
-
-        return componentId
-      }
-    }
-
-    throw new ConfigurationError(`Given file "${src}", doesn't exist.`, 'AdminJS.html')
-  }
 }
 
 AdminJS.VERSION = VERSION
@@ -379,6 +324,5 @@ AdminJS.ACTIONS = ACTIONS
 interface AdminJS extends TranslateFunctions {}
 
 export const { registerAdapter } = AdminJS
-export const { bundle } = AdminJS
 
 export default AdminJS

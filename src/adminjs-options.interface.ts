@@ -80,11 +80,11 @@ export interface AdminJSOptions {
    *         text: 'I am fetched from the backend',
    *       }
    *     },
-   *     component: AdminJS.bundle('./components/some-stats'),
+   *     component: 'SomeStats',
    *   },
    *   anotherPage: {
    *     label: "TypeScript page",
-   *     component: AdminJS.bundle('./components/test-component'),
+   *     component: 'TestComponent',
    *   },
    * },
    */
@@ -381,7 +381,7 @@ export type AdminPage = {
    */
   handler?: PageHandler;
   /**
-   * Component defined by using {@link AdminJS.bundle}
+   * Component defined by using {@link ComponentLoader}
    */
   component: string;
 

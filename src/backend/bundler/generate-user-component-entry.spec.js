@@ -1,5 +1,6 @@
 import path from 'path'
 import AdminJS from '../../adminjs'
+import ComponentLoader from '../../utils/component-loader'
 import generateUserComponentEntry from './generate-user-component-entry'
 
 const exampleComponent = '../../../spec/fixtures/example-component'
@@ -26,7 +27,8 @@ describe('generateUserComponentEntry', function () {
 
   it('adds components to the entry file', function () {
     const adminJs = new AdminJS()
-    const componentId = AdminJS.bundle(exampleComponent)
+    const loader = new ComponentLoader()
+    const componentId = loader.add('ExampleComponent', exampleComponent)
     const rootEntryPath = path.resolve(entryPath)
     const filePath = path.relative(
       rootEntryPath,
